@@ -3,14 +3,15 @@
 //
 
 #include <iostream>
+#include <cassert>
 #include "file_exchange.h"
 #include "app_version.h"
 #include "converter_json.h"
 
 
-nlohmann::json JSON::config = NULL;
-nlohmann::json JSON::requests = NULL;
-nlohmann::json JSON::answers = NULL;
+nlohmann::json JSON::config = 0;
+nlohmann::json JSON::requests = 0;
+nlohmann::json JSON::answers = 0;
 
 const char* EmptyConfigException::what() const noexcept {
     return "Config file is empty";
@@ -31,7 +32,7 @@ status ConfigInit::checkCorrectConfig() {
         if (currentVersion != APP_VERSION)
             throw WrongVersionException();
         std::cout << "Welcome to the " << JSON::config["config"]["name"] << " application!" << std::endl;
-        return OK;
+        return status::OK;
     }
     catch (const EmptyConfigException &ex) {
         std::cerr << ex.what() << std::endl;
@@ -44,22 +45,23 @@ status ConfigInit::checkCorrectConfig() {
     catch (...) {
         std::cerr << "Unknown Error!" << std::endl;
     }
-    return ERROR;
+    return status::ERROR;
 }
 
 std::vector<std::string> ConverterJSON::getTextDocuments() {
 
     std::vector<std::string> texts;
-    for (int i = 0; i < JSON::config["files"].size(); i++) {
+    assert(!JSON::config["files"].empty());
+    for (auto & filePath : JSON::config["files"]) {
         std::string text;
-        std::string path = JSON::config["files"][i];
-        if (FileExchange::readFromFile(text, path, true) == OK)
+        std::string path = filePath;
+        if (FileExchange::readFromFile(text, path, true) == status::OK)
             texts.push_back(text);
     }
     return texts;
 }
 
-int ConverterJSON::getResponsesLimit() {
+size_t ConverterJSON::getResponsesLimit() {
     if (JSON::config["config"]["max_responses"].empty() || JSON::config["config"]["max_responses"] < 1)
         return 5;
 
@@ -67,16 +69,16 @@ int ConverterJSON::getResponsesLimit() {
 }
 
 std::vector<std::string> ConverterJSON::getRequests() {
-    std::vector<std::string> requestsVec;
-    if (FileExchange::readFromFile(JSON::requests, "requests.json") == OK) {
-        for (int i = 0; i < JSON::requests["requests"].size(); i++) {
-            requestsVec.push_back(JSON::requests["requests"][i]);
+    std::vector<std::string> requests;
+    if (FileExchange::readFromFile(JSON::requests, "requests.json") == status::OK) {
+        for (auto & request : JSON::requests["requests"]) {
+            requests.push_back(request);
         }
     }
-    return requestsVec;
+    return requests;
 }
 
-void ConverterJSON::putAnswers(std::vector<std::vector<std::pair<int, double>>> answers) {
+status ConverterJSON::putAnswers(std::vector<std::vector<std::pair<size_t, double>>> answers) {
     std::vector<nlohmann::json> requestJsonAnswers(answers.size());
     for (int i = 0; i < answers.size(); i++) {
         std::string request = "request" + (i < 100 ? (i < 10 ? "00" + std::to_string(i + 1) : "0" + std::to_string(i + 1)) : std::to_string(i + 1));
@@ -101,6 +103,5 @@ void ConverterJSON::putAnswers(std::vector<std::vector<std::pair<int, double>>> 
         jsonAnswers["answers"].push_back(requestJsonAnswer);
         JSON::answers = jsonAnswers;
 
-    FileExchange::writeToFile(JSON::answers, "answers.json");
-
+    return FileExchange::writeToFile(JSON::answers, "answers.json");
 }

@@ -3,14 +3,11 @@
 //
 /*!
  * \file
- * \brief Заголовочный файл с описанием шаблонных методов для обмена информацией с файлами
+ * \brief Header file describing template methods for exchanging information with files
  *
- * Заголовочный файл с описанием шаблонных методов для обмена информацией с файлами.
- * Содержит класс FileExchange для работы с файлами, находящимися на ПК пользователя.
+ * Header file describing template methods for exchanging information with files.
+ * Contains the FileExchange class for working with files located on the user's PC.
  */
-
-#ifndef SEARCH_ENGINE_FILE_EXCHANGE_H
-#define SEARCH_ENGINE_FILE_EXCHANGE_H
 
 #pragma once
 
@@ -20,34 +17,34 @@
 #include "status.h"
 
 /*!
- * Класс для обмена данными (чтение, запись) с файлами , находящимися на ПК пользователя.
+ * Class for data exchange (reading, writing) with files located on the user's PC.
  */
 class FileExchange {
 public:
     FileExchange() = default;
 
     /*!
-     * Метод чтения данных из файла на ПК пользователя.
-     * @tparam T тип данных (nlohmann::json, std::string)
-     * @param [out] object переменная, в которую сохраняются считанные данные
-     * @param [in] path путь к файлу с данными
-     * @param [in] isText параметр, который должен быть установлен следующим образом:
-     * isText = true ecли T = std::string
-     * @return Возвращает статус операции:
-     * OK - считывание прошло успешно;
-     * ERROR - произошла ошибка при считывании файла.
+     * The method for reading data from a file on the user's PC.
+     * @tparam T data type (nlohmann::json, std::string)
+     * @param [out] object variable in which the read data is stored
+     * @param [in] path path to data file
+     * @param [in] isText parameter to be set as follows:
+     * isText = true if T = std::string
+     * @return operation status:
+     * OK - reading was successful;
+     * ERROR - an error occurred while reading the file.
      */
     template<typename T>
     static status readFromFile(T &object, const std::string &path, bool isText = false);
 
     /*!
-     * Метод записи данных в файл на ПК пользователя.
-     * @tparam T тип данных (nlohmann::json, std::string)
-     * @param [in] object переменная, данные из которой записываются в файл
-     * @param [in] path путь к файлу. Если данного файла раньше не существовало, то он будет создан
-     * @return Возвращает статус операции:
-     * OK - запись прошла успешно;
-     * ERROR - произошла ошибка при записи в файл.
+     * The method for writing data to a file on the user's PC.
+     * @tparam T data type (nlohmann::json, std::string)
+     * @param [in] object variable whose data is written to the file
+     * @param [in] path path to data file. If this file did not exist before, it will be created
+     * @return operation status:
+     * OK - recording was successful;
+     * ERROR - an error occurred while writing to file.
      */
     template <typename T>
     static status writeToFile(T &object, const std::string& path);
@@ -71,13 +68,13 @@ status FileExchange::readFromFile(T &object, const std::string &path, bool isTex
             }
         }
         file.close();
-        return OK;
+        return status::OK;
     }
     catch (const std::ifstream::failure &ex) {
         std::cerr << "Can't open file: " << path << std::endl;
         if (file.is_open())
             file.close();
-        return ERROR;
+        return status::ERROR;
     }
 }
 
@@ -89,14 +86,13 @@ status FileExchange::writeToFile(T &object, const std::string& path) {
         file.open(path);
         file << object;
         file.close();
-        return OK;
+        return status::OK;
     }
     catch (const std::ofstream::failure &ex) {
         std::cerr << "Can't write to file: " << path << std::endl;
         if (file.is_open())
             file.close();
-        return ERROR;
+        return status::ERROR;
     }
 }
 
-#endif //SEARCH_ENGINE_FILE_EXCHANGE_H

@@ -10,16 +10,16 @@
 
 InvertedIndex::InvertedIndex() = default;
 
-std::vector<std::vector<int>> InvertedIndex::getGroupsOfElements(int amount, int groups) {
+std::vector<std::vector<size_t>> InvertedIndex::getGroupsOfElements(size_t amount, int groups) {
     assert (amount > 0 && groups > 0);
-    std::vector<std::vector<int>> result;
+    std::vector<std::vector<size_t>> result;
     if (amount < groups)
-        groups = amount;
+        groups = (int) amount;
 
     result.resize(groups);
 
     int i = 0;
-    for(int j = 0; j < amount; j++) {
+    for(size_t j = 0; j < amount; j++) {
         result[i].push_back(j);
         if (++i == groups)
             i = 0;
@@ -28,7 +28,7 @@ std::vector<std::vector<int>> InvertedIndex::getGroupsOfElements(int amount, int
     return result;
 }
 
-void InvertedIndex::updateDocumentBase(std::vector<std::string> inputDocs) {
+void InvertedIndex::updateDocumentBase(const std::vector<std::string>& inputDocs) {
     assert (!inputDocs.empty());
     docs = inputDocs;
     freqDictionary.clear();
@@ -44,8 +44,8 @@ void InvertedIndex::updateDocumentBase(std::vector<std::string> inputDocs) {
 std::vector<Entry> InvertedIndex::getWordCount(const std::string &word) {
     std::vector<Entry> result;
     std::mutex resultAccess;
-    ///< hardwareThreadsNum равно количеству потоков, которые возможно создать на данном ПК
-    int hardwareThreadsNum = std::thread::hardware_concurrency() != 0 ? std::thread::hardware_concurrency() : 1;
+    ///< hardwareThreadsNum is equal to the number of threads that can be created on this PC
+    int hardwareThreadsNum = std::thread::hardware_concurrency() != 0 ? (int) std::thread::hardware_concurrency() : 1;
     auto docGroups = getGroupsOfElements(docs.size(), hardwareThreadsNum);
     std::vector<std::thread> threads(docGroups.size());
 
@@ -74,8 +74,8 @@ std::vector<Entry> InvertedIndex::getWordCount(const std::string &word) {
 
 void InvertedIndex::fillDictionaryByWords() {
     std::mutex resultAccess;
-    ///< hardwareThreadsNum равно количеству потоков, которые возможно создать на данном ПК
-    int hardwareThreadsNum = std::thread::hardware_concurrency() != 0 ? std::thread::hardware_concurrency() : 1;
+    ///< hardwareThreadsNum is equal to the number of threads that can be created on this PC
+    int hardwareThreadsNum = std::thread::hardware_concurrency() != 0 ? (int) std::thread::hardware_concurrency() : 1;
     auto docGroups = getGroupsOfElements(docs.size(), hardwareThreadsNum);
     std::vector<std::thread> threads(docGroups.size());
 
@@ -90,7 +90,7 @@ void InvertedIndex::fillDictionaryByWords() {
                         break;
                     if (freqDictionary.find(word) == freqDictionary.end()) {
                         resultAccess.lock();
-                        freqDictionary.insert(std::pair<std::string, std::vector<Entry>>(word, NULL));
+                        freqDictionary.insert(std::pair<std::string, std::vector<Entry>>(word, 0));
                         resultAccess.unlock();
                     }
                 }
@@ -101,12 +101,12 @@ void InvertedIndex::fillDictionaryByWords() {
         thr.join();
 }
 
-int InvertedIndex::getCount(const std::string &text, const std::string &word) {
+size_t InvertedIndex::getCount(const std::string &text, const std::string &word) {
     if (text.empty() || text.length() < word.length())
         return 0;
 
-    int counter = 0;
-    std::stringstream textStream(text + ' '); ///< Пробел добавляется для корректной проверки на eof
+    size_t counter = 0;
+    std::stringstream textStream(text + ' '); ///< The space is added to correctly check for eof
     std::string wordFromText;
     while(true) {
         textStream >> wordFromText;
@@ -119,8 +119,8 @@ int InvertedIndex::getCount(const std::string &text, const std::string &word) {
     return counter;
 }
 
-std::map<std::string, std::vector<Entry>>* InvertedIndex::getFreqDictionary_ptr() {
-    return &freqDictionary;
+std::map<std::string, std::vector<Entry>> InvertedIndex::getFreqDictionary() {
+    return freqDictionary;
 }
 
 size_t InvertedIndex::getDocsAmount() {

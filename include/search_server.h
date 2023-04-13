@@ -3,11 +3,9 @@
 //
 /*!
  * \file
- * \brief Заголовочный файл с обьявлением структуры RelativeIndex и класса SearchServer
+ * \brief Header file declaring the RelativeIndex structure and 
+ * the SearchServer class
  */
-
-#ifndef SEARCH_ENGINE_SEARCH_SERVER_H
-#define SEARCH_ENGINE_SEARCH_SERVER_H
 
 #pragma once
 
@@ -16,8 +14,8 @@
 
 
 /*!
- * Структура, содержащая поле Id документа и поле rank, соответсвующее относительной релевантности данного документа
- * для определенного поискового запроса
+ * A structure containing the document's Id field and a rank field corresponding to 
+ * the relative relevance of this document for a particular search query.
  */
 struct RelativeIndex {
     size_t docId;
@@ -30,57 +28,59 @@ struct RelativeIndex {
 class SearchServer {
 public:
 /*!
-* @param idx в конструктор класса передаётся ссылка на класс InvertedIndex,
-* чтобы SearchServer мог узнать частоту слов встречаемых в запросе
-*/
-    SearchServer(InvertedIndex &inIndex);
+ * @param idx a reference to the InvertedIndex class is passed to the class constructor 
+ * so that SearchServer can find out the frequency of words found in the request
+ */
+    explicit SearchServer(InvertedIndex &inIndex);
 
 /*!
-* Метод обработки поисковых запросов
-* @param [in] queriesInput поисковые запросы, взятые из файла requests.json
-* @return возвращает отсортированный список релевантных ответов для заданных запросов
-*/
+ * The method of processing search queries
+ * @param [in] queriesInput search requests taken from the requests.json file
+ * @return sorted list of relevant responses for given queries
+ */
     std::vector<std::vector<RelativeIndex>> search(const std::vector<std::string> &queriesInput);
 private:
     InvertedIndex index;
 
 /*!
- * Метод выдаёт список уникальных слов для запроса
- * @param [in] request запрос
- * @return список уникальных слов
+ * The method returns a list of unique words for the query
+ * @param [in] request the query
+ * @return list of unique words
  */
-    std::unordered_set<std::string> getUniqueWords(const std::string &request);
+    static std::unordered_set<std::string> getUniqueWords(const std::string &request);
 
 /*!
- * Метод сортирует уникальные слова в порядке увеличения их частоты встречаемости в соответствии с частотным словарём
- * @param [in] uniqueWords уникальные слова запроса
- * @return отсортированный список уникальных слов
+ * The method sorts unique words in order of increasing frequency of occurrence according to 
+ * the frequency dictionary.
+ * @param [in] uniqueWords unique query words
+ * @return sorted list of unique words
  */
     std::vector<std::string> sortUniqueWords(const std::unordered_set<std::string> &uniqueWords);
 
 /*!
- * Метод вычисляет значение абсолютной релевантности для одного документа
- * @param [in] Id документа, для которого рассчитывается значение абсолютной релевантности
- * @param [in] words набор слов, по которым вычисляется абсолютная релевантность документа
- * @return значение абсолютной релевантности
+ * The method calculates the absolute relevance value for one document
+ * @param [in] Id of the document for which the absolute relevance value is calculated
+ * @param [in] words a set of words by which the absolute relevance of a document is calculated
+ * @return absolute relevance value
  */
-    int calcAbsoluteForDoc(size_t &id, std::vector<std::string> &words);
+    size_t calcAbsoluteForDoc(size_t &id, std::vector<std::string> &words);
 
 /*!
- * Метод вычисляет относительную релевантность для каждого документа из вектора документов
- * @param [in] Ids вектор документов, по которым осуществляется поиск
- * @param [in] absolutes вектор абсолютной релевантности для вектора документов
- * @param [out] indexes вектор индекстов относительной релевантности для вектора документов
+ * The method calculates the relative relevance for each document from a vector of documents
+ * @param [in] Ids vector of documents to be searched
+ * @param [in] absolutes absolute relevance vector for document vector
+ * @param [out] indexes vector of indexes of relative relevance for the vector of documents
  */
-    void calcRelative(std::vector<size_t> &Ids, std::vector<int> &absolutes, std::vector<RelativeIndex> &indexes);
+    static void calcRelative(std::vector<size_t> &Ids, std::vector<size_t> &absolutes, 
+		std::vector<RelativeIndex> &indexes);
 public:
 /*!
-* Метод, осуществляющий конвертацию данных типа std::vector<std::vector<RelativeIndex>> в
-* std::vector<std::vector<std::pair<int, double>>> для дальнейшей работы с методами класса ConverterJSON
-* @param [in] searchResult входные данные типа std::vector<std::vector<RelativeIndex>>
-* @return выходные данные типа std::vector<std::vector<std::pair<int, double>>>
-*/
-    static std::vector<std::vector<std::pair<int, double>>> convert(const std::vector<std::vector<RelativeIndex>> &searchResult);
+ * Method that converts data of type std::vector<std::vector<RelativeIndex>> to 
+ * std::vector<std::vector<std::pair<int, double>>> for further work with ConverterJSON class methods
+ * @param [in] searchResult input data of type std::vector<std::vector<RelativeIndex>>
+ * @return output data of type std::vector<std::vector<std::pair<int, double>>>
+ */
+    static std::vector<std::vector<std::pair<size_t, double>>> convert(
+		const std::vector<std::vector<RelativeIndex>> &searchResult);
 };
 
-#endif //SEARCH_ENGINE_SEARCH_SERVER_H

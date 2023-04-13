@@ -13,8 +13,8 @@ typedef std::vector<std::pair<std::string, size_t>> pairs_t;
 SearchServer::SearchServer(InvertedIndex &inIndex) : index(inIndex) {}
 
 std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<std::string> &queriesInput) {
-    ///< Данное условие необходимо для правильной работы приложения при тестировании
-    if (JSON::config == NULL)
+    ///< This condition is necessary for the correct operation of the application during testing.
+    if (JSON::config == 0)
         FileExchange::readFromFile(JSON::config, "..\\config.json");
 
     std::vector<std::vector<RelativeIndex>> result;
@@ -27,7 +27,7 @@ std::vector<std::vector<RelativeIndex>> SearchServer::search(const std::vector<s
             docIds.push_back(i);
 
         std::vector<RelativeIndex> relativeIndexes(0);
-        std::vector<int> absolutes;
+        std::vector<size_t> absolutes;
         for (auto &docId: docIds)
             absolutes.push_back(calcAbsoluteForDoc(docId, sortedWords));
 
@@ -54,10 +54,10 @@ std::unordered_set<std::string> SearchServer::getUniqueWords(const std::string &
 std::vector<std::string> SearchServer::sortUniqueWords(const std::unordered_set<std::string> &uniqueWords) {
     pairs_t sorted;
     for (auto const &uniqueWord: uniqueWords) {
-        auto freqDictionary_ptr = index.getFreqDictionary_ptr();
-        auto it = freqDictionary_ptr->find(uniqueWord);
+        auto freqDictionary = index.getFreqDictionary();
+        auto it = freqDictionary.find(uniqueWord);
         size_t sum = 0;
-        if (it != freqDictionary_ptr->end()) {
+        if (it != freqDictionary.end()) {
             for (auto const &entry: it->second) {
                 sum += entry.count;
             }
@@ -78,11 +78,12 @@ std::vector<std::string> SearchServer::sortUniqueWords(const std::unordered_set<
     return result;
 }
 
-int SearchServer::calcAbsoluteForDoc(size_t &id, std::vector<std::string> &words) {
-    int sum = 0;
+size_t SearchServer::calcAbsoluteForDoc(size_t &id, std::vector<std::string> &words) {
+    size_t sum = 0;
     for (auto &word : words) {
-        auto record = index.getFreqDictionary_ptr()->find(word);
-        if (record != index.getFreqDictionary_ptr()->end()) {
+        auto freqDictionary = index.getFreqDictionary();
+        auto record = freqDictionary.find(word);
+        if (record != freqDictionary.end()) {
             for (auto &entry : record->second) {
                 if (entry.docId == id)
                     sum += entry.count;
@@ -92,16 +93,16 @@ int SearchServer::calcAbsoluteForDoc(size_t &id, std::vector<std::string> &words
     return sum;
 }
 
-void SearchServer::calcRelative(std::vector<size_t> &Ids, std::vector<int> &absolutes, std::vector<RelativeIndex> &indexes) {
-    int max = absolutes[0];
-    for (int &absolute : absolutes) {
+void SearchServer::calcRelative(std::vector<size_t> &Ids, std::vector<size_t> &absolutes, std::vector<RelativeIndex> &indexes) {
+    size_t max = 0;
+    for (size_t &absolute : absolutes) {
         if (max < absolute)
             max = absolute;
     }
     indexes.resize(Ids.size());
     for (int i = 0; i < Ids.size(); i++) {
         indexes[i].docId = Ids[i];
-        indexes[i].rank = (absolutes[i] != 0 ? (double) absolutes[i] / max : 0);
+        indexes[i].rank = (absolutes[i] != 0 ? (double) absolutes[i] / (double) max : 0);
     }
 
     std::sort(indexes.begin(), indexes.end(), [] (const auto &a , const auto &b) {
@@ -117,15 +118,15 @@ void SearchServer::calcRelative(std::vector<size_t> &Ids, std::vector<int> &abso
         indexes.pop_back();
 }
 
-std::vector<std::vector<std::pair<int, double>>> SearchServer::convert(
+std::vector<std::vector<std::pair<size_t, double>>> SearchServer::convert(
                                                 const std::vector<std::vector<RelativeIndex>> &searchResult) {
 
-    std::vector<std::vector<std::pair<int, double>>> answers;
+    std::vector<std::vector<std::pair<size_t, double>>> answers;
     for (auto &oneRequestResult : searchResult) {
-        std::vector<std::pair<int, double>> oneAnswer;
+        std::vector<std::pair<size_t, double>> oneAnswer;
 
         for (auto &index : oneRequestResult) {
-            std::pair<int, double> indexPair;
+            std::pair<size_t, double> indexPair;
 
             indexPair.first = index.docId;
             indexPair.second = index.rank;

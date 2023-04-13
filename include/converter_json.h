@@ -3,15 +3,14 @@
 //
 /*!
  * \file
- * \brief Заголовочный файл с обьявлением структуры статических данных и класса для работы с JSON-файлами
+ * \brief Header file declaring the structure of the processed data and the class for working with 
+ * JSON files
  *
- * Заголовочный файл с обьявлением структуры статических данных и класса для работы с JSON-файлами.
- * Содержит структуру struct JSON, состоящую из набора статических полей для хранения данных JSON-типа,
- * а также класс ConverterJSON для работы с JSON-файлами,
- * классы EmptyConfigException и WrongVersionException для генерации исключений при работе с данными конфигурации.
+ * Header file declaring the structure of the processed data and the class for working with JSON files.
+ * Contains a JSON structure consisting of a set of static fields for storing JSON-type data, as well as 
+ * the ConverterJSON class for working with JSON files, the EmptyConfigException and WrongVersionException 
+ * classes for throwing exceptions when working with configuration data.
  */
-#ifndef SEARCH_ENGINE_CONVERTER_JSON_H
-#define SEARCH_ENGINE_CONVERTER_JSON_H
 
 #pragma once
 
@@ -21,7 +20,7 @@
 #include "status.h"
 
 /*!
- *\brief Структура для хранения статических данных в JSON-формате
+ *\brief Structure for storing static data in JSON format
  */
 struct JSON {
     static nlohmann::json config;
@@ -30,10 +29,10 @@ struct JSON {
 };
 
 /*!
- *\brief Класс, переопределяющий метод what родительского класса std::exception
+ *\brief The class that overrides the what method of the parent class std::exception
  *
- * Класс, переопределяющий метод what родительского класса std::exception.
- * Используется для генерации исключения при отсутствии поля "config" в переменной JSON::config.
+ * The class that overrides the what method of the parent class std::exception.
+ * Used to throw an exception when there is no "config" field in the JSON::config variable.
  */
 class EmptyConfigException : public std::exception {
 public:
@@ -41,11 +40,11 @@ public:
 };
 
 /*!
- *\brief Класс, переопределяющий метод what родительского класса std::exception
+ *\brief The class that overrides the what method of the parent class std::exception
  *
- * Класс, переопределяющий метод what родительского класса std::exception.
- * Используется для генерации исключения при несоответствии версии движка, указанной в поле "config" переменной JSON::config и
- * версии проекта, указанной в файле CMakelists.txt
+ * The class that overrides the what method of the parent class std::exception.
+ * Used to throw an exception if the engine version specified in the "config" field of the 
+ * JSON::config variable does not match the project version specified in the CMakelists.txt file
  */
 class WrongVersionException: public std::exception {
 public:
@@ -53,56 +52,55 @@ public:
 };
 
 /*!
- *\brief Класс, содержащий метод checkCorrectConfig() для валидации данных, хранящихся в переменной JSON::config
+ *\brief Class containing the checkCorrectConfig() method to validate the data stored in the 
+ * JSON::config variable
  */
 class ConfigInit {
 public:
     ConfigInit();
 
 /*!
- *\brief Метод для определения валидности данных, хранящихся в переменной JSON::config
+ *\brief Method for determining the validity of data stored in a JSON::config variable
  *
- * @return Возвращает статус валидности данных:
- * OK - данные валидны;
- * ERROR -данные невалидны либо возникла ошибка при их обработке
+ * @return the data validity status:
+ * OK - data is valid;
+ * ERROR - the data is invalid or an error occurred while processing it
  */
     static status checkCorrectConfig();
 };
 
 /*!
-*
-* Класс для работы с JSON-файлами
-*/
+ *
+ * Class for working with JSON files
+ */
 
 class ConverterJSON {
 public:
     ConverterJSON() = default;
 
 /*!
-* Метод получения содержимого файлов
-* @return Возвращает список с содержимым файлов перечисленных
-* в config.json
-*/
-    std::vector<std::string> getTextDocuments();
+ * File content retrieval method
+ * @return list with contents of files listed in config.json
+ */
+    static std::vector<std::string> getTextDocuments();
 
 /*!
-* Метод считывает поле max_responses для определения предельного
-* количества ответов на один запрос
-* @return возвращает предельное количество ответов на один запрос
-*/
-    static int getResponsesLimit();
+ * The method reads the max_responses field to determine 
+ * the maximum number of responses per request
+ * @return limit on the number of responses per request
+ */
+    static size_t getResponsesLimit();
 
 /*!
-* Метод получения запросов из файла requests.json
-* @return возвращает список запросов из файла requests.json
-*/
-    std::vector<std::string> getRequests();
+ * The method for receiving requests from the requests.json file
+ * @return list of requests from requests.json file
+ */
+    static std::vector<std::string> getRequests();
 
 /*!
-* Метод помещения в файл answers.json результатов поисковых запросов
-*/
-    void putAnswers(std::vector<std::vector<std::pair<int, double>>>
+ * The method for putting search results in the answers.json file
+ */
+    static status putAnswers(std::vector<std::vector<std::pair<size_t, double>>>
     answers);
 };
 
-#endif //SEARCH_ENGINE_CONVERTER_JSON_H

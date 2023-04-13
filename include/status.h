@@ -2,15 +2,11 @@
 // Created by Mihail on 14.03.2023.
 //
 
-#ifndef SEARCH_ENGINE_STATUS_H
-#define SEARCH_ENGINE_STATUS_H
-
 #pragma once
 
-/// Набор различных состояний
-enum status {
-    OK,     ///< результат обработки данных валиден
-    ERROR   ///< результат обработки данных невалиден либо при обработке произошло выбрасывание исключения
+/// Set of different states
+enum class status {
+    OK,     ///< data processing result is valid
+    ERROR   ///< data processing result is invalid or an exception was thrown during processing
 };
 
-#endif //SEARCH_ENGINE_STATUS_H

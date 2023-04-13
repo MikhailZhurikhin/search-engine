@@ -3,11 +3,8 @@
 //
 /*!
  * \file
- * \brief Заголовочный файл с обьявлением структуры Entry и класса InvertedIndex
+ * \brief Header file declaring the Entry structure and the Inverted Index class
  */
-
-#ifndef SEARCH_ENGINE_INVERTED_INDEX_H
-#define SEARCH_ENGINE_INVERTED_INDEX_H
 
 #pragma once
 
@@ -16,11 +13,12 @@
 #include <map>
 
 /*!
- * Структура, содержащая поле Id документа и поле count, соответсвующее количеству встречаемого конктретного слова в данном документе
+ * A structure containing the field of the document's Id  and a count field 
+ * corresponding to the number of occurrences of a specific word in this document
  */
 struct Entry {
     size_t docId, count;
-// Данный оператор необходим для проведения тестовых сценариев
+//!< This operator is required for test scenarios
     bool operator ==(const Entry& other) const {
         return (docId == other.docId &&
                 count == other.count);
@@ -32,61 +30,62 @@ public:
     InvertedIndex();
 
 /*!
-* Метод заполняет базу документов, по которой совершается поиск
-* @param [in] inputDocs содержимое документов
+* The method fills the base of documents on which the search is performed
+* @param [in] inputDocs document content
 */
-    void updateDocumentBase(std::vector<std::string> inputDocs);
+    void updateDocumentBase(const std::vector<std::string>& inputDocs);
 
 /*!
-* Метод определяет количество вхождений слова word в загруженной базе
-документов
-* @param [in] word слово, частоту вхождений которого необходимо определить
-* @return возвращает подготовленный список с частотой слов
+* The method determines the number of occurrences of the word in the loaded 
+* document base
+* @param [in] word the word whose occurrence frequency is to be determined
+* @return prepared list with word frequency
 */
     std::vector<Entry> getWordCount(const std::string &word);
 
 /*!
- * Метод получения указателя на частотный словарь.
- * @return возвращает указатель на частотный словарь
+ * The method for getting a frequency dictionary.
+ * @return frequency dictionary
  */
-    std::map<std::string, std::vector<Entry>>* getFreqDictionary_ptr();
+    std::map<std::string, std::vector<Entry>> getFreqDictionary();
 
 /*!
- * Метод получения количества документов, по которым осуществляется поиск.
- * @return возвращает количество документов, по которым осуществляется поиск.
+ * The method for getting the number of documents to search.
+ * @return number of documents to search.
  */
     size_t getDocsAmount();
 
 private:
 
-    std::vector<std::string> docs; /// список содержимого документов
-    std::map<std::string, std::vector<Entry>> freqDictionary; /// частотный словарь
+    std::vector<std::string> docs; //!< document content list
+    std::map<std::string, std::vector<Entry>> freqDictionary; //!< frequency dictionary
 
 /*!
- * Метод заполнения частотного словаря словами из документов, по которым осуществляется поиск
+ * The method of filling the frequency dictionary with words from the documents 
+ * that are being searched
  */
     void fillDictionaryByWords();
 
     /*!
-     * Метод получения количества вхождений слова в текст.
-     * @param [in] text тест, по которому прогисходит поиск слова
-     * @param [in] word слово, которое ищется в тексте
-     * @return количество входждений слова word в текст text
+     * The method for getting the number of occurrences of a word in a text.
+     * @param [in] text word search test
+     * @param [in] word the word to be searched for in the text
+     * @return the number of occurrences of the word in the text
      */
-    int getCount(const std::string &text, const std::string &word);
+    static size_t getCount(const std::string &text, const std::string &word);
 
 /*!
- * \brief Метод группирует заданное количество элементов в заданное колчество групп.
+ * \brief The method groups the specified number of elements into the specified number 
+ * of groups.
  *
- * Метод группирует заданное количество элементов в заданное колчество групп.
- * Данный метод необходим для оптимального распределения обрабатываемых документов на потоки.
- * Например, при входных данных amount = 7, groups = 3, получим результат
+ * The method groups the specified number of elements into the specified number of groups.
+ * This method is necessary for the optimal distribution of processed documents into threads.
+ * For example, with the input data amount = 7, groups = 3, we get the result
  * {{0, 3, 6}, {1, 4}, {2, 5}}.
- * @param [in] amount количество элементов, которые нужно разбить на группы
- * @param [in] groups количество групп
- * @return вектор векторов сгруппированных номеров элементов
+ * @param [in] amount the number of elements to be divided into groups
+ * @param [in] groups the number of groups
+ * @return vector of vectors of grouped element numbers
  */
-    std::vector<std::vector<int>> getGroupsOfElements(int amount, int groups);
+    static std::vector<std::vector<size_t>> getGroupsOfElements(size_t amount, int groups);
 };
 
-#endif //SEARCH_ENGINE_INVERTED_INDEX_H
