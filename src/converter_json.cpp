@@ -24,7 +24,7 @@ const char* WrongVersionException::what() const noexcept {
 ConfigInit::ConfigInit() = default;
 
 status ConfigInit::checkCorrectConfig() {
-    double currentVersion = 0.0;
+    std::string currentVersion;
     try {
         if (JSON::config["config"].empty())
             throw EmptyConfigException();
@@ -39,8 +39,7 @@ status ConfigInit::checkCorrectConfig() {
     }
     catch (const WrongVersionException &ex) {
         std::cerr << ex.what() << std::endl;
-        std::cout << std::fixed << std::setprecision(1);
-        std::cout << "Current version: " << currentVersion << ". Need version: " << (double) APP_VERSION << std::endl;
+        std::cout << "Current version: " << currentVersion << ". Need version: " << APP_VERSION << std::endl;
     }
     catch (...) {
         std::cerr << "Unknown Error!" << std::endl;

@@ -58,23 +58,25 @@ issuing search results in JSON format.
         "../resources/file001.txt",
         "../resources/file002.txt",
         "../resources/file003.txt",
-        "../resources/file004.txt",
-        …
+        "../resources/file004.txt"
     ]
 }
 ```
 - config — general information, without which the application does not start.
-**if the config.json file is missing, or if the "config" field in the config.json file is missing, the application will generate an appropriate error and stop working.**
+
+  **if the config.json file is missing, or if the "config" field in the config.json file is missing, the application will generate an appropriate error and stop working.**
 
 - name — field with the name of the search engine. In this case, _"Everything Will Found"_. User can change this name.
 
 - version — field with the version number of the search engine.
-**If the application version specified in the config.json file and the application version specified in CMakeLists.txt do not match, the application will generate an appropriate error and stop working.**
+
+  **If the application version specified in the config.json file and the application version specified in CMakeLists.txt do not match, the application will generate an appropriate error and stop working.**
 
 - max_responses — field that determines the maximum number of responses to one request. The default value of this field is 5.
 
 - files  — the paths to the files to be searched.
-**If there is no file in the path specified in the "files" field, the application will issue a warning to the console and this file will be ignored during the document indexing process.**
+
+  **If there is no file in the path specified in the "files" field, the application will issue a warning to the console and this file will be ignored during the document indexing process.**
 
 * _An example of requests.json file description_:
 ```json
@@ -83,8 +85,7 @@ issuing search results in JSON format.
         "some words..",
         "some words..",
         "some words..",
-        "some words..",
-        …
+        "some words.."
     ]
 }
 ```
@@ -117,13 +118,14 @@ issuing search results in JSON format.
 
 - request001 … 003 — the identifier of the request on which the response was generated. The request ID is generated automatically in the order in which the requests are in the requests field of the requests.json file. For example:
 ```json
-"requests": [
-    "some words..", the request ID is equal “request001” for this string
-    "some words..", the request ID is equal “request002” for this string
-    "some words..", the request ID is equal “request003” for this string
-    "some words..", the request ID is equal “request004” for this string
-    …
-]
+{
+  "requests": [
+    "some words.. (the request ID is equal “request001” for this string)",
+    "some words.. (the request ID is equal “request002” for this string)",
+    "some words.. (the request ID is equal “request003” for this string)",
+    "some words.. (the request ID is equal “request004” for this string)"
+  ]
+}
 ```
 - result – query search result. If it evaluates to true, then at least one document was found for this query. If the result is false, then no documents were found. Then there are no other fields in the response to this request.
 
@@ -132,13 +134,14 @@ issuing search results in JSON format.
 Next, there are correspondences between the response rating and the name of the id of the document in which the search was carried out:
 - <document id>("docid") — ID of the document in which the response to the request was found. It is generated automatically when indexing all documents based on the order in which the documents are located in the files field in the config.json file. For example, if in the config.json field, the files field contains:
 ```json
-"files": [
-    "../resources/file001.txt", docid will be equal to 0 for a given file
-    "../resources/file002.txt", docid will be equal to 1 for a given file
-    "../resources/file003.txt", docid will be equal to 2 for a given file
-    "../resources/file004.txt", docid will be equal to 3 for a given file
-    …
-]
+{
+  "files": [
+    "../resources/file001.txt (docid will be equal to 0 for a given file)",
+    "../resources/file002.txt (docid will be equal to 1 for a given file)",
+    "../resources/file003.txt (docid will be equal to 2 for a given file)",
+    "../resources/file004.txt (docid will be equal to 3 for a given file)"
+  ]
+}
 ```
 - <response rank>(“rank”) — search ranking. This number shows how good the document is for the given query. In the response, document id's are arranged in order of decreasing search ranking.
 
@@ -159,17 +162,23 @@ For the existence of document indexing, the SearchServer class is used, which ca
 
 1. Create or edit file config.json with the desired application settings and the paths to the files you want to search.
 2. Create or edit file requests.json according to your search queries.
-3. Launch the standard console and enter the following commands:
+3. Add the following paths to the PATH environment variable:
+- Path to bin folder when MinGW.exe is contained (For example D:\Programs\MinGW\bin);
+- Path to bin folder when cmake.exe is contained (For example D:\Programs\JetBrains\CLion 2022.1.2\bin\cmake\win\bin).
+4. Download the [Nlohmann JSON library](https://github.com/nlohmann/json) to the search_engine folder, unpack it and rename the folder json-develop to nlohmann_json.
+5. Launch the standard console and enter the following commands:
 ```
-* set PATH=(specify the full path to the cmake.exe file)
-cd (specify the full path to the search_enjine folder)
-* mkdir build
+cd (specify the full path to the search_engine folder)
+mkdir build
 cd build
 cmake ../
 cmake --build ./ --target search_engine
+cd ../
+search_engine.exe
 ```
-4. After running, file answers.json will be generated. Open it and you will see the result of searching.
-5. You can also build and launch unit tests:
+6. If building happens without error, you have got a file "search_engine.exe" in your project folder. You can execute next searching just running this file.
+7. After running, file answers.json will be generated. Open it, and you will see the result of searching.
+8. You can also build and launch unit tests:
 ```
 cmake --build ./ --target tests
 cd tests
