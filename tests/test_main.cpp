@@ -1,16 +1,11 @@
 #include "gtest/gtest.h"
 #include "search_server.h"
 
-TEST(sample_test_case, sample_test) {
-EXPECT_EQ(1, 1);
-}
-
 //Test for InvertedIndex class-------
-using namespace std;
 void TestInvertedIndexFunctionality(
-        const vector<string>& docs,
-        const vector<string>& requests,
-        const std::vector<vector<Entry>>& expected
+        const std::vector<std::string>& docs,
+        const std::vector<std::string>& requests,
+        const std::vector<std::vector<Entry>>& expected
 ) {
     std::vector<std::vector<Entry>> result;
     InvertedIndex idx;
@@ -22,12 +17,12 @@ void TestInvertedIndexFunctionality(
     ASSERT_EQ(result, expected);
 }
 TEST(TestCaseInvertedIndex, TestBasic) {
-    const vector<string> docs = {
+    const std::vector<std::string> docs = {
             "london is the capital of great britain",
             "big ben is the nickname for the Great bell of the striking clock"
     };
-    const vector<string> requests = {"london", "the"};
-    const vector<vector<Entry>> expected = {
+    const std::vector<std::string> requests = {"london", "the"};
+    const std::vector<std::vector<Entry>> expected = {
             {
                     {0, 1}
             }, {
@@ -38,14 +33,14 @@ TEST(TestCaseInvertedIndex, TestBasic) {
 }
 
 TEST(TestCaseInvertedIndex, TestBasic2) {
-    const vector<string> docs = {
+    const std::vector<std::string> docs = {
             "milk milk milk milk water water water",
             "milk water water",
             "milk milk milk milk milk water water water water water",
             "americano cappuccino"
     };
-    const vector<string> requests = {"milk", "water", "cappuccino"};
-    const vector<vector<Entry>> expected = {
+    const std::vector<std::string> requests = {"milk", "water", "cappuccino"};
+    const std::vector<std::vector<Entry>> expected = {
             {
                     {0, 4}, {1, 1}, {2, 5}
             }, {
@@ -58,12 +53,12 @@ TEST(TestCaseInvertedIndex, TestBasic2) {
 }
 
 TEST(TestCaseInvertedIndex, TestInvertedIndexMissingWord) {
-    const vector<string> docs = {
+    const std::vector<std::string> docs = {
             "a b c d e f g h i j k l",
             "statement"
     };
-    const vector<string> requests = {"m", "statement"};
-    const vector<vector<Entry>> expected = {
+    const std::vector<std::string> requests = {"m", "statement"};
+    const std::vector<std::vector<Entry>> expected = {
             {
             }, {
                     {1, 1}
@@ -75,14 +70,14 @@ TEST(TestCaseInvertedIndex, TestInvertedIndexMissingWord) {
 
 //Test for SearchServer class--------
 TEST(TestCaseSearchServer, TestSimple) {
-    const vector<string> docs = {
+    const std::vector<std::string> docs = {
             "milk milk milk milk water water water",
             "milk water water",
             "milk milk milk milk milk water water water water water",
             "americano cappuccino"
     };
-    const vector<string> request = {"milk water", "sugar"};
-    const std::vector<vector<RelativeIndex>> expected = {
+    const std::vector<std::string> request = {"milk water", "sugar"};
+    const std::vector<std::vector<RelativeIndex>> expected = {
             {
                     {2, 1},
                     {0, 0.7},
@@ -94,11 +89,11 @@ TEST(TestCaseSearchServer, TestSimple) {
     InvertedIndex idx;
     idx.updateDocumentBase(docs);
     SearchServer srv(idx);
-    std::vector<vector<RelativeIndex>> result = srv.search(request);
+    std::vector<std::vector<RelativeIndex>> result = srv.search(request);
     ASSERT_EQ(result, expected);
 }
 TEST(TestCaseSearchServer, TestTop5) {
-    const vector<string> docs = {
+    const std::vector<std::string> docs = {
             "london is the capital of great britain",
             "paris is the capital of france",
             "berlin is the capital of germany",
@@ -122,8 +117,8 @@ TEST(TestCaseSearchServer, TestTop5) {
             "tallinn is the capital of estonia",
             "warsaw is the capital of poland",
     };
-    const vector<string> request = {"moscow is the capital of russia"};
-    const std::vector<vector<RelativeIndex>> expected = {
+    const std::vector<std::string> request = {"moscow is the capital of russia"};
+    const std::vector<std::vector<RelativeIndex>> expected = {
             {
                     {7, 1},
                     {14, 1},
@@ -135,7 +130,7 @@ TEST(TestCaseSearchServer, TestTop5) {
     InvertedIndex idx;
     idx.updateDocumentBase(docs);
     SearchServer srv(idx);
-    std::vector<vector<RelativeIndex>> result = srv.search(request);
+    std::vector<std::vector<RelativeIndex>> result = srv.search(request);
     ASSERT_EQ(result, expected);
 }
 //-----------------------------------
