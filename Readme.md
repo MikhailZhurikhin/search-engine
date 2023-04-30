@@ -165,8 +165,7 @@ For the existence of document indexing, the SearchServer class is used, which ca
 3. Add the following paths to the PATH environment variable:
 - Path to bin folder when MinGW.exe is contained (For example D:\Programs\MinGW\bin);
 - Path to bin folder when cmake.exe is contained (For example D:\Programs\JetBrains\CLion 2022.1.2\bin\cmake\win\bin).
-4. Download the [Nlohmann JSON library](https://github.com/nlohmann/json) to the search_engine folder, unpack it and rename the folder json-develop to nlohmann_json.
-5. Launch the standard console and enter the following commands:
+4. Launch the standard console and enter the following commands:
 ```
 cd (specify the full path to the search_engine folder)
 mkdir build
@@ -176,9 +175,9 @@ cmake --build ./ --target search_engine
 cd ../
 search_engine.exe
 ```
-6. If building happens without error, you have got a file "search_engine.exe" in your project folder. You can execute next searching just running this file.
-7. After running, file answers.json will be generated. Open it, and you will see the result of searching.
-8. You can also build and launch unit tests:
+5. If building happens without error, you have got a file "search_engine.exe" in your project folder. You can execute next searching just running this file.
+6. After running, file answers.json will be generated. Open it, and you will see the result of searching.
+7. You can also build and launch unit tests:
 ```
 cmake --build ./ --target tests
 cd tests
